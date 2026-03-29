@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Finance Tracker · ₹</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #f4f6f9;
+    --white: #ffffff;
+    --border: #e2e6ed;
+    --text: #0f1923;
+    --text2: #4a5568;
+    --text3: #8a97a8;
+    --green: #16a34a;
+    --green-bg: #f0fdf4;
+    --green-dark: #14532d;
+    --red: #dc2626;
+    --red-bg: #fef2f2;
+    --red-dark: #7f1d1d;
+    --blue: #2563eb;
+    --blue-bg: #eff6ff;
+    --amber: #d97706;
+    --amber-bg: #fffbeb;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow: 0 4px 16px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+    --shadow-lg: 0 10px 32px rgba(0,0,0,0.1);
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  /* ── TOP NAV ── */
+  .topbar {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    height: 58px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .brand-icon {
+    width: 34px;
+    height: 34px;
+    background: var(--green);
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+  }
+
+  .brand-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.3px;
+  }
+
+  .brand-name span {
+    color: var(--green);
+  }
+
+  .topbar-date {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text3);
+    background: var(--bg);
+    padding: 5px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+  }
+
+  /* ── WRAP ── */
+  .wrap { max-width: 640px; margin: 0 auto; padding: 28px 20px 72px; }
+
+  /* ── OVERVIEW CARDS ── */
+  .overview { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+
+  .ov { background: var(--white); border-radius: var(--radius); padding: 22px 20px; box-shadow: var(--shadow-sm); border: 1px solid var(--border); position: relative; overflow: hidden; }
+
+  .ov::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    border-radius: var(--radius) var(--radius) 0 0;
+  }
+
+  .ov.save::before { background: var(--green); }
+  .ov.spend::before { background: var(--red); }
+
+  .ov-icon {
+    width: 36px; height: 36px;
+    border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    margin-bottom: 12px;
+  }
+
+  .ov.save .ov-icon { background: var(--green-bg); }
+  .ov.spend .ov-icon { background: var(--red-bg); }
+
+  .ov-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 4px;
+  }
+
+  .ov-amount {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.5px;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .ov.save .ov-amount { color: var(--green-dark); }
+  .ov.spend .ov-amount { color: var(--red-dark); }
+
+  .ov-rupee { font-size: 0.55em; vertical-align: super; font-weight: 600; margin-right: 1px; }
+
+  .ov-sub {
+    font-size: 11px;
+    color: var(--text3);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* ── NET BALANCE ── */
+  .net {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .net-left { display: flex; flex-direction: column; gap: 2px; }
+  .net-label { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.8px; }
+  .net-desc { font-size: 12px; color: var(--text3); }
+  .net-amount { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; font-family: 'JetBrains Mono', monospace; }
+  .net-amount.pos { color: var(--green); }
+  .net-amount.neg { color: var(--red); }
+
+  /* ── STATS ROW ── */
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 22px; }
+  @media (max-width: 440px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+
+  .stat {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 12px;
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .stat-label { font-size: 10px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.7px; margin-bottom: 6px; }
+  .stat-value { font-size: 18px; font-weight: 700; color: var(--text); letter-spacing: -0.3px; }
+  .stat-value.g { color: var(--green); }
+  .stat-value.r { color: var(--red); }
+  .stat-currency { font-size: 11px; color: var(--text3); font-weight: 500; }
+
+  /* ── TABS ── */
+  .tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 4px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .tab {
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text2);
+    cursor: pointer;
+    transition: all 0.18s;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .tab:hover { background: var(--bg); color: var(--text); }
+  .tab.active-save { background: var(--green); color: #fff; }
+  .tab.active-spend { background: var(--red); color: #fff; }
+
+  /* ── SECTIONS ── */
+  .sec { display: none; }
+  .sec.active { display: block; }
+
+  /* ── PANELS ── */
+  .panel {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 14px;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .panel-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 16px;
+  }
+
+  /* ── CHART ── */
+  .bars { display: flex; align-items: flex-end; gap: 6px; height: 72px; }
+  .bcol { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px; height: 100%; justify-content: flex-end; }
+  .bfill { width: 100%; border-radius: 4px 4px 0 0; transition: height 0.5s ease; min-height: 3px; }
+  .bfill.save-bar { background: #bbf7d0; }
+  .bfill.save-bar.hi { background: var(--green); }
+  .bfill.spend-bar { background: #fecaca; }
+  .bfill.spend-bar.hi { background: var(--red); }
+  .bfill.zero-bar { background: #e2e6ed; }
+  .bdlbl { font-family: 'JetBrains Mono', monospace; font-size: 8px; color: var(--text3); font-weight: 500; }
+  .bdlbl.today { color: var(--green); font-weight: 700; }
+
+  /* ── CATEGORY BREAKDOWN ── */
+  .cat-rows { display: flex; flex-direction: column; gap: 10px; }
+  .cat-row { display: flex; align-items: center; gap: 12px; }
+  .cat-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .cat-name { font-size: 13px; font-weight: 500; color: var(--text); width: 100px; flex-shrink: 0; }
+  .cat-bar-bg { flex: 1; height: 6px; background: var(--bg); border-radius: 3px; overflow: hidden; }
+  .cat-bar-fill { height: 100%; border-radius: 3px; transition: width 0.4s; }
+  .cat-pct { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text3); width: 30px; text-align: right; flex-shrink: 0; }
+  .cat-total { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 500; color: var(--text); width: 54px; text-align: right; flex-shrink: 0; }
+
+  /* ── FORM ── */
+  .form-row { display: grid; gap: 12px; margin-bottom: 12px; }
+  .form-row.two { grid-template-columns: 1fr 1fr; }
+  .form-row.three { grid-template-columns: 1fr 1fr 1fr; }
+  @media (max-width: 460px) { .form-row.two, .form-row.three { grid-template-columns: 1fr; } }
+
+  .field label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    margin-bottom: 6px;
+  }
+
+  .field input, .field select {
+    width: 100%;
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: 9px;
+    padding: 10px 14px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.18s, box-shadow 0.18s;
+    appearance: none;
+  }
+
+  .field input:focus, .field select:focus {
+    border-color: var(--green);
+    background: var(--white);
+    box-shadow: 0 0 0 3px rgba(22,163,74,0.12);
+  }
+
+  .field input::placeholder { color: var(--text3); font-weight: 400; }
+  .field input::-webkit-calendar-picker-indicator { filter: opacity(0.4) grayscale(1); cursor: pointer; }
+
+  .submit-btn {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.2px;
+    transition: all 0.18s;
+    color: #fff;
+  }
+
+  .submit-btn.green-btn { background: var(--green); }
+  .submit-btn.green-btn:hover { background: #15803d; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(22,163,74,0.3); }
+  .submit-btn.red-btn { background: var(--red); }
+  .submit-btn.red-btn:hover { background: #b91c1c; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(220,38,38,0.3); }
+  .submit-btn.ok { background: var(--green) !important; }
+  .submit-btn:active { transform: none; }
+
+  /* ── TABLE ── */
+  .tbl { width: 100%; border-collapse: collapse; }
+  .tbl th {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    padding: 10px 14px;
+    text-align: left;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+  }
+  .tbl th:last-child { text-align: right; }
+  .tbl td { padding: 12px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  .tbl tr:last-child td { border-bottom: none; }
+  .tbl tr:hover td { background: #fafbfc; }
+  .tbl tr.today-row td { background: var(--green-bg); }
+  .tbl tr.today-row:hover td { background: #dcfce7; }
+
+  .td-date { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 500; color: var(--text); white-space: nowrap; }
+  .today-row .td-date { color: var(--green); font-weight: 700; }
+  .td-day { font-size: 12px; color: var(--text2); }
+  .td-note { font-size: 13px; color: var(--text2); max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  .mini-bar { width: 64px; height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; display: inline-block; }
+  .mini-fill-g { height: 100%; background: var(--green); border-radius: 3px; }
+  .mini-fill-r { height: 100%; background: var(--red); border-radius: 3px; }
+
+  .td-amt { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 600; text-align: right; white-space: nowrap; }
+  .td-amt.g { color: var(--green); }
+  .td-amt.r { color: var(--red); }
+  .td-amt.z { color: var(--text3); }
+
+  .badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 5px;
+    letter-spacing: 0.3px;
+    color: #fff;
+  }
+
+  .del-btn {
+    background: none;
+    border: none;
+    color: var(--text3);
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+    padding: 2px 4px;
+    border-radius: 4px;
+    transition: all 0.15s;
+  }
+  .del-btn:hover { color: var(--red); background: var(--red-bg); }
+
+  .empty-state {
+    text-align: center;
+    padding: 36px 20px;
+    color: var(--text3);
+  }
+  .empty-state .empty-icon { font-size: 28px; margin-bottom: 8px; }
+  .empty-state p { font-size: 13px; }
+
+  .footer { text-align: center; font-size: 11px; color: var(--text3); margin-top: 32px; font-family: 'JetBrains Mono', monospace; letter-spacing: 1px; }
+
+  @keyframes slideUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+  .tbl tr { animation: slideUp 0.2s ease both; }
+</style>
+</head>
+<body>
+
+<!-- Topbar -->
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-icon">💰</div>
+    <div class="brand-name">Finance<span>Track</span></div>
+  </div>
+  <div class="topbar-date" id="topDate"></div>
+</div>
+
+<div class="wrap">
+
+  <!-- Overview -->
+  <div class="overview">
+    <div class="ov save">
+      <div class="ov-icon">📈</div>
+      <div class="ov-label">Total Saved</div>
+      <div class="ov-amount"><span class="ov-rupee">₹</span><span id="totalSaved">0</span></div>
+      <div class="ov-sub" id="saveSub">0 of 0 days active</div>
+    </div>
+    <div class="ov spend">
+      <div class="ov-icon">🧾</div>
+      <div class="ov-label">Extra Spends</div>
+      <div class="ov-amount"><span class="ov-rupee">₹</span><span id="totalSpent">0</span></div>
+      <div class="ov-sub" id="spendSub">0 transactions</div>
+    </div>
+  </div>
+
+  <!-- Net -->
+  <div class="net">
+    <div class="net-left">
+      <div class="net-label">Net Balance</div>
+      <div class="net-desc">Savings minus Spends</div>
+    </div>
+    <div class="net-amount" id="netAmt">₹0</div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-label">Best Save</div>
+      <div class="stat-value g"><span class="stat-currency">₹</span><span id="sBest">0</span></div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Avg Save</div>
+      <div class="stat-value g"><span class="stat-currency">₹</span><span id="sAvg">0</span></div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Big Spend</div>
+      <div class="stat-value r"><span class="stat-currency">₹</span><span id="sBig">0</span></div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Avg Spend</div>
+      <div class="stat-value r"><span class="stat-currency">₹</span><span id="sAvgS">0</span></div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active-save" id="tab-save" onclick="switchTab('save')">💰 Savings</button>
+    <button class="tab" id="tab-spend" onclick="switchTab('spend')">🛒 Extra Spends</button>
+  </div>
+
+  <!-- ── SAVINGS SECTION ── -->
+  <div class="sec active" id="sec-save">
+
+    <div class="panel">
+      <div class="panel-title">Daily Savings Chart</div>
+      <div class="bars" id="saveChart"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Log Savings Entry</div>
+      <div class="form-row two">
+        <div class="field">
+          <label>Date</label>
+          <input type="date" id="saveDate"/>
+        </div>
+        <div class="field">
+          <label>Amount ₹</label>
+          <input type="number" min="0" placeholder="Enter amount" id="saveAmt"/>
+        </div>
+      </div>
+      <button class="submit-btn green-btn" id="saveBtn" onclick="addSaving()">+ Add Saving</button>
+    </div>
+
+    <div class="panel" style="padding:0;overflow:hidden">
+      <table class="tbl" id="saveTable">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Day</th>
+            <th>Progress</th>
+            <th>Amount</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="saveTbody"></tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- ── SPENDS SECTION ── -->
+  <div class="sec" id="sec-spend">
+
+    <div class="panel">
+      <div class="panel-title">Daily Spending Chart</div>
+      <div class="bars" id="spendChart"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Spending by Category</div>
+      <div class="cat-rows" id="catRows">
+        <div class="empty-state"><p>No spends yet</p></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Log Extra Spend</div>
+      <div class="form-row three">
+        <div class="field">
+          <label>Date</label>
+          <input type="date" id="spendDate"/>
+        </div>
+        <div class="field">
+          <label>Amount ₹</label>
+          <input type="number" min="0" placeholder="Enter amount" id="spendAmt"/>
+        </div>
+        <div class="field">
+          <label>Category</label>
+          <select id="spendCat">
+            <option value="Food">🍕 Food</option>
+            <option value="Travel">🚌 Travel</option>
+            <option value="Shopping">🛍 Shopping</option>
+            <option value="Entertainment">🎮 Entertainment</option>
+            <option value="Health">💊 Health</option>
+            <option value="Study">📚 Study</option>
+            <option value="Other">📦 Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row" style="margin-bottom:12px">
+        <div class="field">
+          <label>Note (optional)</label>
+          <input type="text" placeholder="e.g. Lunch with friends" id="spendNote"/>
+        </div>
+      </div>
+      <button class="submit-btn red-btn" id="spendBtn" onclick="addSpend()">+ Add Spend</button>
+    </div>
+
+    <div class="panel" style="padding:0;overflow:hidden">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Category</th>
+            <th>Note</th>
+            <th>Amount</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="spendTbody"></tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <div class="footer">track every rupee · save more · spend wise</div>
+</div>
+
+<script>
+  const DAYS_SHORT = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+  const DAYS_FULL  = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  const SAVE_KEY   = "ft_savings_v2";
+  const SPEND_KEY  = "ft_spends_v2";
+
+  const PRELOAD = [
+    { date: "2026-03-20", amount: 40 },
+    { date: "2026-03-21", amount: 40 },
+    { date: "2026-03-22", amount: 50 },
+    { date: "2026-03-23", amount: 0  },
+    { date: "2026-03-24", amount: 100 },
+    { date: "2026-03-25", amount: 100 },
+  ];
+
+  const CAT_COLORS = {
+    Food:"#f97316", Travel:"#3b82f6", Shopping:"#a855f7",
+    Entertainment:"#ec4899", Health:"#10b981", Study:"#0ea5e9", Other:"#6b7280"
+  };
+
+  const getTodayStr = () => new Date().toISOString().split("T")[0];
+  const fmtDate = d => new Date(d+"T00:00:00").toLocaleDateString("en-IN",{day:"2-digit",month:"short"});
+  const dayShort = d => DAYS_SHORT[new Date(d+"T00:00:00").getDay()];
+  const dayFull  = d => DAYS_FULL[new Date(d+"T00:00:00").getDay()];
+
+  function loadSavings() {
+    try { const r = localStorage.getItem(SAVE_KEY); if(r) return JSON.parse(r); } catch(e){}
+    localStorage.setItem(SAVE_KEY, JSON.stringify(PRELOAD));
+    return JSON.parse(JSON.stringify(PRELOAD));
+  }
+  function loadSpends() {
+    try { const r = localStorage.getItem(SPEND_KEY); if(r) return JSON.parse(r); } catch(e){}
+    return [];
+  }
+  const saveSavings = d => localStorage.setItem(SAVE_KEY, JSON.stringify(d));
+  const saveSpends  = d => localStorage.setItem(SPEND_KEY, JSON.stringify(d));
+
+  function switchTab(t) {
+    document.querySelectorAll('.sec').forEach(s => s.classList.remove('active'));
+    document.getElementById('sec-'+t).classList.add('active');
+    document.getElementById('tab-save').className  = 'tab' + (t==='save'  ? ' active-save'  : '');
+    document.getElementById('tab-spend').className = 'tab' + (t==='spend' ? ' active-spend' : '');
+  }
+
+  function render() {
+    const savings = loadSavings();
+    const spends  = loadSpends();
+    const today   = getTodayStr();
+
+    const totalSaved = savings.reduce((s,e) => s+e.amount, 0);
+    const totalSpent = spends.reduce((s,e) => s+e.amount, 0);
+    const net        = totalSaved - totalSpent;
+    const active     = savings.filter(e => e.amount>0).length;
+    const maxSave    = Math.max(...savings.map(e=>e.amount), 1);
+    const bestSave   = savings.length ? Math.max(...savings.map(e=>e.amount)) : 0;
+    const avgSave    = savings.length ? Math.round(totalSaved/savings.length) : 0;
+    const bigSpend   = spends.length  ? Math.max(...spends.map(e=>e.amount)) : 0;
+    const avgSpend   = spends.length  ? Math.round(totalSpent/spends.length) : 0;
+
+    // Topbar date
+    document.getElementById("topDate").textContent =
+      new Date().toLocaleDateString("en-IN",{weekday:"short",day:"2-digit",month:"short",year:"numeric"});
+
+    // Overview
+    document.getElementById("totalSaved").textContent = totalSaved.toLocaleString("en-IN");
+    document.getElementById("totalSpent").textContent = totalSpent.toLocaleString("en-IN");
+    document.getElementById("saveSub").textContent    = `${active} of ${savings.length} days active`;
+    document.getElementById("spendSub").textContent   = `${spends.length} transaction${spends.length!==1?'s':''}`;
+
+    // Net
+    const netEl = document.getElementById("netAmt");
+    netEl.textContent  = (net>=0?"+":"−") + " ₹" + Math.abs(net).toLocaleString("en-IN");
+    netEl.className    = "net-amount " + (net>=0 ? "pos" : "neg");
+
+    // Stats
+    document.getElementById("sBest").textContent = bestSave;
+    document.getElementById("sAvg").textContent  = avgSave;
+    document.getElementById("sBig").textContent  = bigSpend;
+    document.getElementById("sAvgS").textContent = avgSpend;
+
+    // Savings chart
+    const sc = savings.slice(-12);
+    document.getElementById("saveChart").innerHTML = sc.map(e => {
+      const pct = (e.amount / maxSave) * 100;
+      const isT = e.date === today;
+      return `<div class="bcol">
+        <div class="bfill ${e.amount===0?'zero-bar':'save-bar'} ${pct>60?'hi':''}"
+             style="height:${Math.max(pct, e.amount===0?4:8)}%"></div>
+        <div class="bdlbl ${isT?'today':''}">${dayShort(e.date)}</div>
+      </div>`;
+    }).join('');
+
+    // Spend chart
+    const spendByDate = {};
+    spends.forEach(s => { spendByDate[s.date] = (spendByDate[s.date]||0)+s.amount; });
+    const spendDates = Object.keys(spendByDate).sort().slice(-12);
+    const maxSpD = Math.max(...Object.values(spendByDate), 1);
+    document.getElementById("spendChart").innerHTML = spendDates.length
+      ? spendDates.map(d => {
+          const amt = spendByDate[d];
+          const pct = (amt/maxSpD)*100;
+          const isT = d===today;
+          return `<div class="bcol">
+            <div class="bfill spend-bar ${pct>60?'hi':''}" style="height:${Math.max(pct,8)}%"></div>
+            <div class="bdlbl ${isT?'today':''}">${dayShort(d)}</div>
+          </div>`;
+        }).join('')
+      : `<div style="width:100%;text-align:center;color:var(--text3);font-size:12px;padding:20px 0">No spending data yet</div>`;
+
+    // Category breakdown
+    const catTotals = {};
+    spends.forEach(s => { catTotals[s.cat] = (catTotals[s.cat]||0)+s.amount; });
+    const catMax = Math.max(...Object.values(catTotals), 1);
+    document.getElementById("catRows").innerHTML = Object.keys(catTotals).length
+      ? Object.entries(catTotals).sort((a,b)=>b[1]-a[1]).map(([cat,amt]) => {
+          const pct = Math.round((amt/totalSpent)*100);
+          return `<div class="cat-row">
+            <div class="cat-dot" style="background:${CAT_COLORS[cat]||'#6b7280'}"></div>
+            <div class="cat-name">${cat}</div>
+            <div class="cat-bar-bg"><div class="cat-bar-fill" style="width:${(amt/catMax)*100}%;background:${CAT_COLORS[cat]||'#6b7280'}"></div></div>
+            <div class="cat-pct">${pct}%</div>
+            <div class="cat-total">₹${amt.toLocaleString("en-IN")}</div>
+          </div>`;
+        }).join('')
+      : `<div style="text-align:center;color:var(--text3);font-size:13px;padding:12px 0">No spends logged yet</div>`;
+
+    // Savings table
+    const sTbody = document.getElementById("saveTbody");
+    if (!savings.length) {
+      sTbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">📭</div><p>No savings logged yet</p></div></td></tr>`;
+    } else {
+      sTbody.innerHTML = [...savings].reverse().map(e => {
+        const isT = e.date===today;
+        const pct = (e.amount/maxSave)*100;
+        return `<tr class="${isT?'today-row':''}">
+          <td class="td-date">${fmtDate(e.date)}${isT?' ·':''}</td>
+          <td class="td-day">${dayFull(e.date).slice(0,3)}</td>
+          <td><div class="mini-bar"><div class="mini-fill-g" style="width:${pct}%"></div></div></td>
+          <td class="td-amt ${e.amount===0?'z':'g'}">${e.amount===0?'—':'₹'+e.amount.toLocaleString('en-IN')}</td>
+          <td><button class="del-btn" onclick="delSaving('${e.date}')">×</button></td>
+        </tr>`;
+      }).join('');
+    }
+
+    // Spends table
+    const spTbody = document.getElementById("spendTbody");
+    if (!spends.length) {
+      spTbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">🧾</div><p>No spends logged yet</p></div></td></tr>`;
+    } else {
+      const spRev = [...spends].reverse();
+      spTbody.innerHTML = spRev.map((e,i) => {
+        const isT = e.date===today;
+        const color = CAT_COLORS[e.cat]||'#6b7280';
+        return `<tr class="${isT?'today-row':''}">
+          <td class="td-date">${fmtDate(e.date)}</td>
+          <td><span class="badge" style="background:${color}">${e.cat}</span></td>
+          <td class="td-note">${e.note||'—'}</td>
+          <td class="td-amt r">₹${e.amount.toLocaleString('en-IN')}</td>
+          <td><button class="del-btn" onclick="delSpend(${spends.length-1-i})">×</button></td>
+        </tr>`;
+      }).join('');
+    }
+  }
+
+  function addSaving() {
+    const date = document.getElementById("saveDate").value;
+    const amt  = parseFloat(document.getElementById("saveAmt").value);
+    if (!date || isNaN(amt) || amt < 0) return;
+    let data = loadSavings();
+    const idx = data.findIndex(e => e.date===date);
+    if (idx>=0) data[idx].amount = amt;
+    else { data.push({date,amount:amt}); data.sort((a,b)=>a.date.localeCompare(b.date)); }
+    saveSavings(data);
+    document.getElementById("saveAmt").value = "";
+    flash("saveBtn","green-btn","+ Add Saving");
+    render();
+  }
+
+  function addSpend() {
+    const date = document.getElementById("spendDate").value;
+    const amt  = parseFloat(document.getElementById("spendAmt").value);
+    const cat  = document.getElementById("spendCat").value;
+    const note = document.getElementById("spendNote").value.trim();
+    if (!date || isNaN(amt) || amt <= 0) return;
+    let data = loadSpends();
+    data.push({date,amount:amt,cat,note});
+    data.sort((a,b)=>a.date.localeCompare(b.date));
+    saveSpends(data);
+    document.getElementById("spendAmt").value = "";
+    document.getElementById("spendNote").value = "";
+    flash("spendBtn","red-btn","+ Add Spend");
+    render();
+  }
+
+  function delSaving(date) {
+    saveSavings(loadSavings().filter(e=>e.date!==date));
+    render();
+  }
+
+  function delSpend(realIdx) {
+    const data = loadSpends();
+    data.splice(realIdx,1);
+    saveSpends(data);
+    render();
+  }
+
+  function flash(id, cls, label) {
+    const btn = document.getElementById(id);
+    btn.textContent = "✓  Saved!";
+    btn.classList.add("ok");
+    setTimeout(() => { btn.textContent = label; btn.classList.remove("ok"); }, 1400);
+  }
+
+  // Init
+  document.getElementById("saveDate").value  = getTodayStr();
+  document.getElementById("spendDate").value = getTodayStr();
+  render();
+</script>
+</body>
+</html>

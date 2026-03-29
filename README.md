@@ -1,2 +1,2 @@
-# Savings-spends-Tracker
-A finance tracker that help people to track savings and extra spending how mush is leftover 
+pocket-finance 
+Track your daily savings and extra spends with category breakdown. Offline-ready, no backend needed.
